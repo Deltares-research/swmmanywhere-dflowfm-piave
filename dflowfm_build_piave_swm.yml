@@ -1,0 +1,76 @@
+# Build a 1D2D D-Flow FM model from the SWMManywhere Piave network.
+# Inputs are prepared by export_swmm_piave.py (hydromt_inputs_piave/); paths are
+# relative to this folder. Until Deltares/hydromt_delft3dfm#365 and #367 are fixed,
+# build with:
+#   python build_dflowfm_piave_withfixes.py
+# Afterwards:
+#   hydromt build dflowfm dflowfm_piave -i dflowfm_build_piave_swm.yml -d hydromt_inputs_piave/data_catalog.yml --fo -v
+
+modeltype: dflowfm
+
+global:
+  crs: 32633
+  network_snap_offset: 0.5
+  snap_newbranches_to_branches_at_snapnodes: true
+  openwater_computation_node_distance: 40
+
+steps:
+  # OSM waterways, split into reaches with DEM-based bed levels (placeholder section)
+  - setup_rivers:
+      region:
+        geom: hydromt_inputs_piave/region_1d.geojson
+      rivers_fn: swm_rivers
+      friction_type: Manning
+      friction_value: 0.023
+
+  # SWMManywhere pipes, outlet pipes at dummy outfalls and connectors to the rivers
+  - setup_pipes:
+      region:
+        geom: hydromt_inputs_piave/region_1d.geojson
+      pipes_fn: swm_pipes
+      crosssections_shape: circle
+
+  # SWMManywhere chamber floor (bedlevel) and surface elevation (streetlevel)
+  - setup_manholes:
+      manholes_fn: swm_manholes
+      bedlevel_shift: 0.0
+      snap_offset: 0.01
+
+  # Terrain is at 690-1140 m, so 0 m water levels act as free outflow
+  - setup_1dboundary:
+      boundary_value: 0.0
+      branch_type: river
+      boundary_type: waterlevel
+      boundary_unit: m
+      boundary_locs: downstream
+
+  - setup_1dboundary:
+      boundary_value: 0.0
+      branch_type: pipe
+      boundary_type: waterlevel
+      boundary_unit: m
+
+  # 2D mesh inside the DEM, so that every mesh node gets a bed level
+  - setup_mesh2d:
+      region:
+        geom: hydromt_inputs_piave/region_2d.geojson
+      res: 25
+
+  # Default interpolation (triangulation); nearestNb leaves 2D bed levels empty
+  - setup_maps_from_rasterdataset:
+      raster_filename: swm_dem
+      variables: ["elevtn"]
+      fill_method: nearest
+
+  - setup_constant_meteo:
+      meteo_type: rainfall_rate
+      constant_value: 300
+
+  - setup_link1d2d:
+      link_direction: 1d_to_2d
+
+  - setup_config:
+      time.tstop: 21600.0
+      # Needed besides the #367 fix: the node next to an outfall boundary is often a
+      # junction or has a 1D2D link
+      geometry.allowbndatbifurcation: 1

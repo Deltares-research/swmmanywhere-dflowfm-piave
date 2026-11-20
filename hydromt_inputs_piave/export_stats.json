@@ -1,0 +1,22 @@
+{
+ "outfalls": 40,
+ "outfalls_to_river": 10,
+ "connector_length_m": [
+  133.7,
+  47.8,
+  58.5,
+  99.4,
+  146.6,
+  60.3,
+  32.1,
+  146.0,
+  52.9,
+  141.8
+ ],
+ "connectors_uphill": 2,
+ "river_reaches": 83,
+ "river_km": 3.75,
+ "swm_pipes": 560,
+ "outlet_pipes": 30,
+ "manholes": 601
+}

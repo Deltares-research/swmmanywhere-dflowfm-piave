@@ -1,0 +1,18 @@
+# Environments and caches
+.mypy_cache/
+__pycache__/
+.cache/
+cache/
+*.log
+*.aux.xml
+
+# Built D-Flow FM models (rebuild with step 3)
+dflowfm_*/
+
+# SWMManywhere outputs: keep only what step 2 reads
+swmm_piave/**/model_1/*
+!swmm_piave/**/model_1/config.yml
+!swmm_piave/**/model_1/nodes.geoparquet
+!swmm_piave/**/model_1/edges.geoparquet
+!swmm_piave/**/model_1/identify_outfalls_edges.geojson
+!swmm_piave/**/model_1/subcatchments.geoparquet

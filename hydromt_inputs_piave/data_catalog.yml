@@ -1,0 +1,41 @@
+# HydroMT data catalog for the SWMManywhere Piave network, written by export_swmm_piave.py.
+# Relative uris are resolved from the folder of this file.
+swm_pipes:
+  data_type: GeoDataFrame
+  uri: pipes.geojson
+  driver:
+    name: pyogrio
+  metadata:
+    crs: 32633
+    category: sewer
+    source_url: https://github.com/ImperialCollegeLondon/SWMManywhere
+swm_rivers:
+  data_type: GeoDataFrame
+  uri: rivers.geojson
+  driver:
+    name: pyogrio
+  metadata:
+    crs: 32633
+    category: hydrography
+    source_url: https://www.openstreetmap.org
+swm_manholes:
+  data_type: GeoDataFrame
+  uri: manholes.geojson
+  driver:
+    name: pyogrio
+  metadata:
+    crs: 32633
+    category: sewer
+    source_url: https://github.com/ImperialCollegeLondon/SWMManywhere
+swm_dem:
+  data_type: RasterDataset
+  uri: ../swmm_piave/bbox_1/download/elevation.tif
+  driver:
+    name: rasterio
+  metadata:
+    crs: 32633
+    category: topography
+    source_url: https://planetarycomputer.microsoft.com/dataset/nasadem
+  data_adapter:
+    rename:
+      elevation: elevtn
